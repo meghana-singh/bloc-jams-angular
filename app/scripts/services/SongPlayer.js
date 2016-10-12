@@ -6,69 +6,81 @@
 *        : Private function: setSong
 *        : Public methods  : SongPlayer.play and SongPlayer.pause.
 *        : Attributes      : currentSong and currentBuzzObject, 
-* @func  :
-* @param :  
-* @return: SongPlayer Object
+* @return: {object} SongPlayer 
 **********************************************************************/
 (function() {
      function SongPlayer() {
-         
-          var SongPlayer = {};
-          var currentSong = null;
+ 
 /**
+ * @desc SongPlayer: This object is returned by this service there by making
+ *                   its properties and methods public to the rest of the app.
+ * @type {Object}
+ **/         
+          var SongPlayer = {};
+/**
+ * @desc currentSong: It holds the current song being played/paused.
+ * @type {Object}
+ **/         
+         
+          var currentSong = null;
+ /**
  * @desc Buzz object audio file
  * @type {Object}
- */         
+ **/         
           var currentBuzzObject = null;
+
+ /**
+ * @function : playSong
+ * @desc     : Plays the audio file - currentBuzzObject and sets song.playing to true.
+ **/       
+         var playSong = function () {
+            currentBuzzObject.play();    
+            song.playing = true;
+         };
 
  /**
  * @function : setSong
  * @desc     : Stops currently playing song and loads new audio file as currentBuzzObject
  * @param    : {Object} song
- * @return   : -
- */
-    var setSong = function(song) {
-    if (currentBuzzObject) {
-        currentBuzzObject.stop();
-        currentSong.playing = null;
-    }
- 
-    currentBuzzObject = new buzz.sound(song.audioUrl, {
-        formats: ['mp3'],
-        preload: true
-    });
- 
-    currentSong = song;
- };
+ **/
+        var setSong = function(song) {
+        if (currentBuzzObject) {
+            currentBuzzObject.stop();
+            currentSong.playing = null;
+        }
+     
+        currentBuzzObject = new buzz.sound(song.audioUrl, {
+            formats: ['mp3'],
+            preload: true
+        });
+     
+        currentSong = song;
+     };
    
  /**
  * @function : SongPlayer.play
  * @desc     : Loads new audio file as currentBuzzObject & plays the song
  * @param    : {Object} song
- * @return   : -
  */
-         SongPlayer.play = function(song) {
-             if (currentSong !== song) {
-                 
-                 setSong(song);
-               
-                 currentBuzzObject.play();    
-                 song.playing = true;
-                 
-             } else if (currentSong === song) {
-                 if (currentBuzzObject.isPaused()) {
-                     currentBuzzObject.play();
-                 }
-             }            
+     SongPlayer.play = function(song) {
+         if (currentSong !== song) {
              
-         };
+             setSong(song);
+             playSong();
+                                    
+         } else if (currentSong === song) {
+             if (currentBuzzObject.isPaused()) {
+                 currentBuzzObject.play();
+             }
+         }            
+         
+     };
  
-/**
+ /**
  * @function : SongPlayer.pause
  * @desc     : Pauses audio file - currentBuzzObject & makes song.playing false
  * @param    : {Object} song
- * @return   : -
- */
+ **/
       SongPlayer.pause = function(song) {
          currentBuzzObject.pause();
          song.playing = false;
