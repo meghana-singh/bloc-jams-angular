@@ -102,7 +102,7 @@
                  //currentBuzzObject.play();
              }
          }            
-         console.log("currentSong.playing: " + SongPlayer.currentSong.playing + " song.playing: " + song.playing);
+         
      };
  
  /**
@@ -112,15 +112,13 @@
  **/
       SongPlayer.pause = function(song) {
         //When song is played from album view song row - song is assigned & when played from playbar currentSong is assigned.
-         console.log("Before pausing -- currentSong.playing: " + SongPlayer.currentSong.playing);   
-         song = song || SongPlayer.currentSong;   
+         song = song || SongPlayer.currentSong;      
          currentBuzzObject.pause();
          song.playing = false;
-         console.log("After pausing -- currentSong.playing: " + SongPlayer.currentSong.playing + " song.playing: " + song.playing);  
-     };
+      };
      
  /**
- * @function : SongPlayer.previous
+ * @function : SongPlayer.previous  
  * @desc     : It updates the song index to the previous song's index and plays the song.
  *           : If the currentSong is the first song then it stops the play of the song.
  **/
