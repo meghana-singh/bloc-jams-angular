@@ -9,7 +9,7 @@
 * @return: {object} SongPlayer 
 **********************************************************************/
 (function() {
-     function SongPlayer(Fixtures) {
+     function SongPlayer($rootScope, Fixtures) {
  
 /**
  * @desc SongPlayer: This object is returned by this service there by making
@@ -62,6 +62,8 @@
  /**
  * @function : setSong
  * @desc     : Stops currently playing song and loads new audio file as currentBuzzObject
+ *           : Updates the volume and currentSong attributes. 
+ *           : Updates the currentTime attribute of the song based on the "timeupdate" event of the currentBuzzObject.
  * @param    : {Object} song
  **/
         var setSong = function(song) {
@@ -74,6 +76,13 @@
             preload: true
         });
      
+        currentBuzzObject.bind('timeupdate', function() {
+          $rootScope.$apply(function() {
+              SongPlayer.currentTime = currentBuzzObject.getTime();
+          });
+        });
+     
+        SongPlayer.volume = currentBuzzObject.getVolume();    
         SongPlayer.currentSong = song;
      };
    
@@ -82,7 +91,19 @@
  * @type {Object}
  **/         
           SongPlayer.currentSong = null;
-                  
+ 
+/**
+ * @desc Current playback time (in seconds) of currently playing song
+ * @type {Number}
+ */
+ SongPlayer.currentTime = null;
+
+/**
+ * @desc Current volume of currently playing song
+ * @type {Number}
+ */
+ SongPlayer.volume = null;
+         
  /**
  * @function : SongPlayer.play
  * @desc     : Loads new audio file as currentBuzzObject & plays the song
@@ -155,11 +176,35 @@
          
           return SongPlayer;
      }
+    
+/**
+ * @function setCurrentTime
+ * @desc Set current time (in seconds) of currently playing song
+ * @param {Number} time
+ */
+     SongPlayer.setCurrentTime = function(time) {
+         console.log("setCurrentTime is called!");
+         if (currentBuzzObject) {
+             currentBuzzObject.setTime(time);
+         }
+     };
  
+/**
+ * @function setVolume
+ * @desc Set the volume for the current playing song
+ * @param {Number} volume
+ */
+     SongPlayer.setVolume = function(volume) {
+         console.log("setVolume is called!");
+         if (currentBuzzObject) {
+             currentBuzzObject.setVolume(volume);
+         }
+     };
+    
  /**
  * @desc: Create a factory service SongPlayer for playing/pausing songs.
  */  
      angular
          .module('blocJams')
-         .factory('SongPlayer', ["Fixtures", SongPlayer]);
+         .factory('SongPlayer', ["$rootScope", "Fixtures", SongPlayer]);
  })();
