@@ -24,13 +24,19 @@
             replace: true,
             restrict: 'E',
             scope: { 
-                    onChange: '&'
+                    onChange: '&',
+                    buzzObj: '<',
+                    updateCurrentTime: '&'
                    },
             link: function(scope, element, attributes) {
              // directive logic to return
-                 scope.value = 0;
-                 scope.max = 100;
-                 var seekBar = $(element);
+                scope.value = 0;
+                scope.max = 100;
+                scope.currSongTime = 0;
+                scope.songSet = 0;
+                
+               
+                var seekBar = $(element);
                 
                 attributes.$observe('value', function(newValue) {
                      scope.value = newValue;
@@ -38,6 +44,16 @@
  
                 attributes.$observe('max', function(newValue) {
                      scope.max = newValue;
+                });
+                
+                attributes.$observe('songSet', function(newValue) {
+                    scope.songSet = newValue;
+                    if (newValue == 1) {
+                      updateSongTime();  
+                        console.log("updateSongTime called scope.songSet: " + scope.songSet);
+                    } else {
+                        console.log("updateSongTime not called scope.songSet: " + scope.songSet);
+                    }
                 });
                 
                  var percentString = function () {
@@ -72,10 +88,21 @@
                      });
                  };
                 
+                var updateSongTime = function() {
+                    scope.buzzObj.bind('timeupdate', function() {
+                    //  scope.$apply(function() {
+                        scope.currSongTime = scope.buzzObj.getTime();
+                        console.log("updateSongTime was called. currentTime: " + scope.currSongTime);  
+                        scope.updateCurrentTime({value: scope.currSongTime});
+                    //  });
+                    
+                    }
+                };
+                
                 var notifyOnChange = function(newValue) {
                      if (typeof scope.onChange === 'function') {
                          scope.onChange({value: newValue});
-                         console.log("notifyOnChange is called and the value updated in the onChange function. newValue:" + newValue);
+                       //  console.log("notifyOnChange is called and the value updated in the onChange function. newValue:" + newValue);
                      }
                 };
                 

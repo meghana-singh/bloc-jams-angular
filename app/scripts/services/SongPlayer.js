@@ -5,7 +5,7 @@
 *        : its properties and methods public to the rest of the application.
 *        : Private function: setSong
 *        : Public methods  : SongPlayer.play and SongPlayer.pause.
-*        : Attributes      : SongPlayer.currentSong and currentBuzzObject, 
+*        : Attributes      : SongPlayer.currentSong and Song.currentBuzzObject, 
 * @return: {object} SongPlayer 
 **********************************************************************/
 (function() {
@@ -35,54 +35,55 @@
              return currentAlbum.songs.indexOf(song);
          };
          
- /**
- * @desc Buzz object audio file
- * @type {Object}
- **/         
-          var currentBuzzObject = null;
-
+ 
  /**
  * @function : playSong
- * @desc     : Plays the audio file - currentBuzzObject and sets song.playing to true.
+ * @desc     : Plays the audio file - Song.currentBuzzObject and sets song.playing to true.
  **/       
          var playSong = function (song) {
-            currentBuzzObject.play();    
+            SongPlayer.currentBuzzObject.play();    
             song.playing = true;
          };
 
  /**
  * @function : stopSong
- * @desc     : Stops the audio file - currentBuzzObject and sets song.playing to false.
+ * @desc     : Stops the audio file - Song.currentBuzzObject and sets song.playing to false.
  **/       
          var stopSong = function () {
-            currentBuzzObject.stop();
+            SongPlayer.currentBuzzObject.stop();
             SongPlayer.currentSong.playing = null;
+            SongPlayer.songIsSet = 0; 
         }
 
  /**
  * @function : setSong
- * @desc     : Stops currently playing song and loads new audio file as currentBuzzObject
+ * @desc     : Stops currently playing song and loads new audio file as Song.currentBuzzObject
  *           : Updates the volume and currentSong attributes. 
- *           : Updates the currentTime attribute of the song based on the "timeupdate" event of the currentBuzzObject.
+ *           : Updates the currentTime attribute of the song based on the "timeupdate" event of the Song.currentBuzzObject.
  * @param    : {Object} song
  **/
         var setSong = function(song) {
-        if (currentBuzzObject) {
+        if (SongPlayer.currentBuzzObject) {
             stopSong();
+            
         }
      
-        currentBuzzObject = new buzz.sound(song.audioUrl, {
+        SongPlayer.currentBuzzObject = new buzz.sound(song.audioUrl, {
             formats: ['mp3'],
             preload: true
         });
-     
-        currentBuzzObject.bind('timeupdate', function() {
-          $rootScope.$apply(function() {
-              SongPlayer.currentTime = currentBuzzObject.getTime();
-          });
+   
+        SongPlayer.songIsSet = 1;
+            
+/*        Song.currentBuzzObject.bind('timeupdate', function() {
+//         $rootScope.$apply(function() {
+              //SongPlayer.currentTimeNotWatched = Song.currentBuzzObject.getTime();
+              SongPlayer.currentTime = Song.currentBuzzObject.getTime();
+//          });
         });
-     
-        SongPlayer.volume = currentBuzzObject.getVolume();    
+     */
+            
+        SongPlayer.volume = SongPlayer.currentBuzzObject.getVolume();    
         SongPlayer.currentSong = song;
      };
    
@@ -97,16 +98,24 @@
  * @type {Number}
  */
  SongPlayer.currentTime = null;
-
+ SongPlayer.currentTimeNotWatched = null;
+         
 /**
  * @desc Current volume of currently playing song
  * @type {Number}
  */
  SongPlayer.volume = null;
+ 
+/**
+ * @desc Buzz object audio file
+ * @type {Object}
+ **/         
+          SongPlayer.currentBuzzObject = null;
+          SongPlayer.songIsSet = null;
          
  /**
  * @function : SongPlayer.play
- * @desc     : Loads new audio file as currentBuzzObject & plays the song
+ * @desc     : Loads new audio file as Song.currentBuzzObject & plays the song
  * @param    : {Object} song
  */
      SongPlayer.play = function(song) {
@@ -118,9 +127,9 @@
              playSong(song);
                                     
          } else if (SongPlayer.currentSong === song) {
-             if (currentBuzzObject.isPaused()) {
+             if (SongPlayer.currentBuzzObject.isPaused()) {
                  playSong(song);
-                 //currentBuzzObject.play();
+                 //Song.currentBuzzObject.play();
              }
          }            
          
@@ -128,13 +137,13 @@
  
  /**
  * @function : SongPlayer.pause
- * @desc     : Pauses audio file - currentBuzzObject & makes song.playing false
+ * @desc     : Pauses audio file - Song.currentBuzzObject & makes song.playing false
  * @param    : {Object} song
  **/
       SongPlayer.pause = function(song) {
         //When song is played from album view song row - song is assigned & when played from playbar currentSong is assigned.
          song = song || SongPlayer.currentSong;      
-         currentBuzzObject.pause();
+         SongPlayer.currentBuzzObject.pause();
          song.playing = false;
       };
      
@@ -184,8 +193,8 @@
  */
      SongPlayer.setCurrentTime = function(time) {
          console.log("setCurrentTime is called!");
-         if (currentBuzzObject) {
-             currentBuzzObject.setTime(time);
+         if (SongPlayer.currentBuzzObject) {
+             SongPlayer.currentBuzzObject.setTime(time);
          }
      };
  
@@ -196,10 +205,14 @@
  */
      SongPlayer.setVolume = function(volume) {
          console.log("setVolume is called!");
-         if (currentBuzzObject) {
-             currentBuzzObject.setVolume(volume);
+         if (SongPlayer.currentBuzzObject) {
+             SongPlayer.currentBuzzObject.setVolume(volume);
          }
      };
+
+    SongPlayer.updateCurrentTime = function (newTime) {
+      SongPlayer.currentTime = newTime;    
+    };
     
  /**
  * @desc: Create a factory service SongPlayer for playing/pausing songs.
