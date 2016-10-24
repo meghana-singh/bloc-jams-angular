@@ -52,11 +52,13 @@
 
  /**
  * @function : stopSong
- * @desc     : Stops the audio file - currentBuzzObject and sets song.playing to false.
+ * @desc     : Stops the audio file - currentBuzzObject and sets playing & songEnded attributes to false.
  **/       
          var stopSong = function () {
             currentBuzzObject.stop();
             SongPlayer.currentSong.playing = null;
+            SongPlayer.songEnded = null;
+            SongPlayer.isMute = false;    
         }
 
  /**
@@ -64,6 +66,7 @@
  * @desc     : Stops currently playing song and loads new audio file as currentBuzzObject
  *           : Updates the volume and currentSong attributes. 
  *           : Updates the currentTime attribute of the song based on the "timeupdate" event of the currentBuzzObject.
+ *           : Plays the next song automatically once the current song comes to an end.
  * @param    : {Object} song
  **/
         var setSong = function(song) {
@@ -81,7 +84,18 @@
               SongPlayer.currentTime = currentBuzzObject.getTime();
           });
         });
-     
+            
+        //To check if song ended. If true, start the playback of next song.
+        currentBuzzObject.bind('ended', function() {
+          $rootScope.$apply(function() {
+              SongPlayer.songEnded = true;
+          });
+          if (SongPlayer.songEnded === true) {
+            SongPlayer.next();
+            SongPlayer.songEnded = null;
+          }
+        });
+            
         SongPlayer.volume = currentBuzzObject.getVolume();    
         SongPlayer.currentSong = song;
      };
@@ -91,7 +105,8 @@
  * @type {Object}
  **/         
           SongPlayer.currentSong = null;
- 
+          SongPlayer.songEnded = null;
+         
 /**
  * @desc Current playback time (in seconds) of currently playing song
  * @type {Number}
@@ -103,6 +118,12 @@
  * @type {Number}
  */
  SongPlayer.volume = null;
+
+ /**
+ * @desc currently playing song is mute or unmuted.
+ * @type {boolean} By default, its unmute.
+ */
+ SongPlayer.isMute = false;         
          
  /**
  * @function : SongPlayer.play
@@ -173,17 +194,14 @@
                  playSong(song);
              }
      };
-         
-          return SongPlayer;
-     }
-    
+
+             
 /**
  * @function setCurrentTime
  * @desc Set current time (in seconds) of currently playing song
  * @param {Number} time
  */
      SongPlayer.setCurrentTime = function(time) {
-         console.log("setCurrentTime is called!");
          if (currentBuzzObject) {
              currentBuzzObject.setTime(time);
          }
@@ -195,11 +213,28 @@
  * @param {Number} volume
  */
      SongPlayer.setVolume = function(volume) {
-         console.log("setVolume is called!");
          if (currentBuzzObject) {
              currentBuzzObject.setVolume(volume);
          }
      };
+/**
+ * @function Mute
+ * @desc Mute the volume for the current playing song
+ */
+    SongPlayer.mute = function() {
+        if (currentBuzzObject) {
+            if (currentBuzzObject.isMuted()) {
+              currentBuzzObject.unmute();
+              SongPlayer.isMute = false;    
+            } else {
+              currentBuzzObject.mute();    
+              SongPlayer.isMute = true;        
+            }
+         }
+    };
+         
+          return SongPlayer;
+     }
     
  /**
  * @desc: Create a factory service SongPlayer for playing/pausing songs.

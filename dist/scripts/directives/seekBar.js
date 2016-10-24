@@ -24,7 +24,7 @@
             replace: true,
             restrict: 'E',
             scope: { 
-                    onChange: '&'
+                    'onChange': '&'
                    },
             link: function(scope, element, attributes) {
              // directive logic to return
@@ -75,7 +75,6 @@
                 var notifyOnChange = function(newValue) {
                      if (typeof scope.onChange === 'function') {
                          scope.onChange({value: newValue});
-                         console.log("notifyOnChange is called and the value updated in the onChange function. newValue:" + newValue);
                      }
                 };
                 
