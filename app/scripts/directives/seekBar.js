@@ -90,13 +90,12 @@
                 
                 var updateSongTime = function() {
                     scope.buzzObj.bind('timeupdate', function() {
-                    //  scope.$apply(function() {
+                      scope.$apply(function() {
                         scope.currSongTime = scope.buzzObj.getTime();
                         console.log("updateSongTime was called. currentTime: " + scope.currSongTime);  
                         scope.updateCurrentTime({value: scope.currSongTime});
-                    //  });
-                    
-                    }
+                      });
+                    });
                 };
                 
                 var notifyOnChange = function(newValue) {

@@ -182,10 +182,8 @@
                  playSong(song);
              }
      };
-         
-          return SongPlayer;
-     }
-    
+
+             
 /**
  * @function setCurrentTime
  * @desc Set current time (in seconds) of currently playing song
@@ -213,6 +211,9 @@
     SongPlayer.updateCurrentTime = function (newTime) {
       SongPlayer.currentTime = newTime;    
     };
+
+          return SongPlayer;
+     }
     
  /**
  * @desc: Create a factory service SongPlayer for playing/pausing songs.
